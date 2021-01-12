@@ -23,13 +23,17 @@ public class MyLinkedList {
     }
     else {
       start = new Node(value);
+      end = start;
     }
     size += 1;
     return true;
   }
   public boolean add(int index, String value) {
     Node current = start;
-    if (index == 0) {
+    if (size == 0) {
+      return add(value);
+    }
+    else if (index == 0) {
       Node n = new Node(value);
       start.setPrev(n);
       n.setNext(start);
@@ -38,12 +42,7 @@ public class MyLinkedList {
       return true;
     }
     else if (index == size) {
-      Node n = new Node(value);
-      n.setPrev(end);
-      end.setNext(n);
-      end = n;
-      size += 1;
-      return true;
+      return add(value);
     }
     Node n = new Node(value);
     for (int i = 0; i < index; i++) {
@@ -64,7 +63,7 @@ public class MyLinkedList {
     for (int i = 0; i < index; i++) {
       current = current.getNext();
       if (current == null) {
-        return "null";
+        throw new IndexOutOfBoundsException();
       }
     }
     return current.getData();
@@ -74,19 +73,74 @@ public class MyLinkedList {
     for (int i = 0; i < index; i++) {
       current = current.getNext();
       if (current == null) {
-        return "null";
+        throw new IndexOutOfBoundsException();
       }
 
     }
-    return current.setData(value);
+    String x = current.getData();
+    current.setData(value);
+    return x;
   }
   public String toString() {
+    if (size == 0) {
+      return "[]";
+    }
     Node current = start;
-    String returnString = "{";
+    String returnString = "[";
     while (current != null) {
-      returnString += current.getData() + ",";
+      returnString += current.getData() + ", ";
       current = current.getNext();
     }
-    return returnString.substring(0, returnString.length() - 1) + "}";
+    return returnString.substring(0, returnString.length() - 2) + "]";
+  }
+  public String toStringReversed() {
+    if (size == 0) {
+      return "[]";
+    }
+    Node current = end;
+    String returnString = "[";
+    while (current != null) {
+      returnString += current.getData() + ", ";
+      current = current.getPrev();
+    }
+    return returnString.substring(0, returnString.length() - 2) + "]";
+  }
+  public String remove(int index) {
+    String prev = get(index);
+    if (size == 1) {
+      start = null;
+      size -= 1;
+    }
+    else if (index == size - 1) {
+      end = end.getPrev();
+      end.setNext(null);
+      size -= 1;
+    }
+    else if (index == 0) {
+      start = start.getNext();
+      start.setPrev(null);
+    }
+    else {
+      Node current = start;
+      for (int i = 0; i < index; i++) {
+        current = current.getNext();
+        if (current == null) {
+          throw new IndexOutOfBoundsException();
+        }
+      }
+      current.getPrev().setNext(current.getNext());
+      current.getNext().setPrev(current.getPrev());
+      size -= 1;
+    }
+    return prev;
+  }
+  public void extend(MyLinkedList other) {
+    end.setNext(other.start);
+    other.start.setPrev(end);
+    end = other.end;
+    other.start = null;
+    other.end = null;
+    size = other.size + size;
+    other.size = 0;
   }
 }
